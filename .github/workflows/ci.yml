@@ -17,7 +17,7 @@ jobs:
       - name: Configure the Build System
         run: |
           cmake --preset default
-          ls build/default
+          tree build/default
 
       - name: Build the Project
         run: |
