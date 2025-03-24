@@ -1,0 +1,43 @@
+name: CI - Configure, Build, Test, and Package
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        runs-on: [self-ubuntu-24.04, karolina]
+        nps: [2,4,12]
+
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          if [ "${{ matrix.runs-on }}" == "karolina" ]; then
+            module load Boost/1.83.0-GCC-13.2.0 Ninja/1.12.1-GCCcore-13.3.0 OpenMPI/4.1.6-GCC-13.2.0
+          fi
+          cmake --preset default
+          cmake --build --preset default
+          mpirun -np ${{ matrix.nps }} --oversubscribe build/default/myapp/myapp
+
+      - name: Test
+        run: |
+          if [ "${{ matrix.runs-on }}" == "karolina" ]; then
+            module load Boost/1.83.0-GCC-13.2.0 Ninja/1.12.1-GCCcore-13.3.0 OpenMPI/4.1.6-GCC-13.2.0
+          fi
+          ctest --preset default
+
+      - name: Package
+        run: |
+          if [ "${{ matrix.runs-on }}" == "karolina" ]; then
+            module load Boost/1.83.0-GCC-13.2.0 Ninja/1.12.1-GCCcore-13.3.0 OpenMPI/4.1.6-GCC-13.2.0
+          fi
+          cmake --build --preset default -t package
