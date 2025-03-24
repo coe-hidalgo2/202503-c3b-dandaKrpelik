@@ -5,6 +5,8 @@ v1.0, 2023-03-24
 [.lead]
 This repository serves as the template used by GitHub Classroom to generate personalized development environments for HPC training sessions. It is pre-configured with the tools and libraries needed for MPI application development and testing.
 
+https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/disabling-and-enabling-a-workflow?tool=webui[how to disable workflow action]
+
 == Overview
 
 The **c3b-template** repository is designed to:
