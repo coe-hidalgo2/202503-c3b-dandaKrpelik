@@ -13,4 +13,4 @@ jobs:
     steps:
       - run: echo ${{ github.repository }}
       - run: echo ${{ github.repository.lowercase }}
-      - run: echo ${{ github.repository.toLowerCase() }}
+      - run: echo ${{ github.repository.toLowerCase }}
