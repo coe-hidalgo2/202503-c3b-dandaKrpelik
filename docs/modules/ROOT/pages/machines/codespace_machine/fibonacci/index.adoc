@@ -1,0 +1,6 @@
+= fibonacci
+:page-layout: toolboxes
+:page-tags: catalog, toolbox, codespace_machine-fibonacci
+:parent-catalogs: codespace_machine
+:description: 
+:page-illustration: ROOT:fibonacci.jpg

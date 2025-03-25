@@ -1,0 +1,6 @@
+= Fibonacci
+:page-layout: toolboxes
+:page-tags: catalog, toolbox, fibonacci-Fibonacci
+:parent-catalogs: fibonacci
+:description: 
+:page-illustration: ROOT:Fibonacci.jpg
