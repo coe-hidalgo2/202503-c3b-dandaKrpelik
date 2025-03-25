@@ -10,6 +10,8 @@ on:
 jobs:
   print:
     runs-on: self-ubuntu-24.04
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
     steps:
       - run: echo ${{ github.repository }}
       - id: string
