@@ -50,7 +50,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-
       - id: reponame
         uses: ASzc/change-string-case-action@v6
         with:
@@ -74,7 +73,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
-      
           
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
@@ -84,3 +82,37 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  build-apptainer:
+    runs-on: self-apptainer
+    needs: build-docker
+    env:
+      apptainer: /opt/apptainer/v1.4.0/apptainer/bin/apptainer
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - id: reponame
+        uses: ASzc/change-string-case-action@v6
+        with:
+          string: ${{ github.repository }}       
+
+      - name: Login to GitHub Container Registry
+        run: |
+          ${{ env.apptainer }} remote login -u ${{ github.repository_owner }} -p ${{ secrets.GHCR_PAT }} oras://ghcr.io
+
+      - name: Convert Docker Image to Apptainer SIF
+        run: |
+          # Set the SIF filename based on the repository name.
+          sif=$(basename ${{ steps.reponame.outputs.lowercase }}.sif)
+          # Pull the Docker image (tagged as 'solution') and convert it to a SIF file.
+          ${{ env.apptainer }} pull -F $sif docker://ghcr.io/${{ steps.reponame.outputs.lowercase }}:latest
+          # Inspect the SIF file to verify its contents.
+          ${{ env.apptainer }} inspect $sif
+
+      - name: Upload Apptainer SIF to GitHub Container Registry
+        run: |
+          # Determine the SIF filename.
+          sif=$(basename ${{ steps.reponame.outputs.lowercase }}.sif)
+          # Push the SIF file to GHCR under the tag 'solution-sif'
+          ${{ env.apptainer }} push $sif oras://ghcr.io/${{ steps.reponame.outputs.lowercase }}:solution-sif
