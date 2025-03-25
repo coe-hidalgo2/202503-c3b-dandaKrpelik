@@ -41,7 +41,7 @@ jobs:
       - name: PULL Apptainer SIF
         run: |
           # Pull the SIF file from GHCR
-          $APPTAINER_CMD pull -F $SIF_FILENAME oras:${{ inputs.image }}
+          $APPTAINER_CMD pull -F $SIF_FILENAME oras://${{ inputs.image }}
           # Inspect the SIF file to verify its contents
           $APPTAINER_CMD inspect $SIF_FILENAME
 
