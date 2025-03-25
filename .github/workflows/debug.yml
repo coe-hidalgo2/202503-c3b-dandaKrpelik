@@ -31,5 +31,6 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}        
   another:
     needs: print
+    runs-on: self-ubuntu-24.04
     steps:
       - run: echo ${{ needs.print.outputs.tags }}
