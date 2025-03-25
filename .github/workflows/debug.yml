@@ -1,0 +1,16 @@
+name: DEBUG
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  print:
+    runs-on: self-ubuntu-24.04
+    steps:
+      - run: echo ${{ github.repository }}
+      - run: echo ${{ github.repository.lowercase }}
+      - run: echo ${{ github.repository.toLowerCase() }}
