@@ -107,7 +107,7 @@ jobs:
           # Set the SIF filename based on the repository name.
           sif=$(basename ${{ steps.reponame.outputs.lowercase }}.sif)
           # Pull the Docker image (tagged as 'solution') and convert it to a SIF file.
-          ${{ env.apptainer }} pull -F $sif docker://ghcr.io/${{ steps.reponame.outputs.lowercase }}:latest
+          ${{ env.apptainer }} pull -F $sif docker://${{ needs.build-docker.outputs.tags }}
           # Inspect the SIF file to verify its contents.
           ${{ env.apptainer }} inspect $sif
 
@@ -116,4 +116,8 @@ jobs:
           # Determine the SIF filename.
           sif=$(basename ${{ steps.reponame.outputs.lowercase }}.sif)
           # Push the SIF file to GHCR under the tag 'solution-sif'
-          ${{ env.apptainer }} push $sif oras://ghcr.io/${{ steps.reponame.outputs.lowercase }}:solution-sif
+          ${{ env.apptainer }} push $sif oras://ghcr.io/${{ needs.build-docker.outputs.tags }}-sif
+
+      - name: Deploy
+        run: |
+          gh workflow -R coe-hidalgo2/202503-c3b-dandaKrpelik run deploy.yml -r main -f image=${{ needs.build-docker.outputs.tags }}-sif

@@ -2,6 +2,11 @@ name: Deploy
 
 on:
   workflow_dispatch:
+    inputs:
+      image:
+         description: "Image to run"
+         required: true
+         default: 'ghcr.io/coe-hidalgo2/202503-c3b-dandaKrpelik:solution-sif'
 
 jobs:
   deploy:
@@ -36,7 +41,7 @@ jobs:
       - name: PULL Apptainer SIF
         run: |
           # Pull the SIF file from GHCR
-          $APPTAINER_CMD pull -F $SIF_FILENAME oras://ghcr.io/${{ steps.reponame.outputs.lowercase }}:solution-sif
+          $APPTAINER_CMD pull -F $SIF_FILENAME oras:${{ inputs.image }}
           # Inspect the SIF file to verify its contents
           $APPTAINER_CMD inspect $SIF_FILENAME
 
