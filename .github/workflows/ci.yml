@@ -87,6 +87,8 @@ jobs:
   build-apptainer:
     runs-on: self-apptainer
     needs: build-docker
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
     env:
       apptainer: /opt/apptainer/v1.4.0/apptainer/bin/apptainer
     steps:
@@ -104,6 +106,7 @@ jobs:
 
       - name: Convert Docker Image to Apptainer SIF
         run: |
+          echo ${{ needs.build-docker.outputs.tags }}
           # Set the SIF filename based on the repository name.
           sif=$(basename ${{ steps.reponame.outputs.lowercase }}.sif)
           # Pull the Docker image (tagged as 'solution') and convert it to a SIF file.
