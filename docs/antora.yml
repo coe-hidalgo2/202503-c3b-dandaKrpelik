@@ -1,0 +1,13 @@
+name: my_benchmarks
+title: My Benchmarks
+version: ~
+start_page: index.adoc
+asciidoc:
+  attributes:
+    project_name: My Benchmarks
+    numbered: true
+    dynamic-blocks@: ''
+    allow-uri-read: true
+    hide-uri-scheme: true
+nav:
+  - modules/ROOT/nav.adoc
