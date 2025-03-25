@@ -61,4 +61,4 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository }}:v1
+          tags: ghcr.io/${{ github.repository.lowercase }}:v1
