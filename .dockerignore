@@ -1,9 +1,0 @@
-.devcontainer
-.git/
-.github/
-
-.dockerignore
-.gitignore
-Dockerfile
-
-build/
