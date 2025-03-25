@@ -3,6 +3,8 @@ name: CI - Configure, Build, Test
 on:
   push:
     branches: [ main ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -47,7 +49,25 @@ jobs:
          
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-          
+
+
+      - id: reponame
+        uses: ASzc/change-string-case-action@v6
+        with:
+          string: ${{ github.repository }}          
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ steps.reponame.outputs.lowercase }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}        
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -55,15 +75,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
       
-      - id: reponame
-        uses: ASzc/change-string-case-action@v6
-        with:
-          string: ${{ github.repository }}          
           
       - name: Build and Push Docker Image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile
-          push: true
-          tags: ghcr.io/${{ steps.reponame.outputs.lowercase }}:v1
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
