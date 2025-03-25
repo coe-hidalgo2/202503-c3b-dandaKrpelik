@@ -44,6 +44,8 @@ jobs:
   build-docker:
     needs: build-test
     runs-on: ubuntu-latest
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -87,8 +89,6 @@ jobs:
   build-apptainer:
     runs-on: self-apptainer
     needs: build-docker
-    outputs:
-      tags: ${{ steps.meta.outputs.tags }}
     env:
       apptainer: /opt/apptainer/v1.4.0/apptainer/bin/apptainer
     steps:
