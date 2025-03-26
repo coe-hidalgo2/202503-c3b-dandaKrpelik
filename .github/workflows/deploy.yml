@@ -1,0 +1,59 @@
+name: Deploy
+run-name: "Deploy ${{ inputs.image }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+         description: "Image to run"
+         required: true
+         default: 'ghcr.io/coe-hidalgo2/202503-c3b-dandaKrpelik:solution-sif'
+
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        runs-on: [self-ubuntu-24.04, karolina]
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - id: reponame
+        uses: ASzc/change-string-case-action@v6
+        with:
+          string: ${{ github.repository }}          
+
+      - name: Create sif filename
+        run: |
+          sif=$(basename "${{ steps.reponame.outputs.lowercase }}.sif")
+          echo "SIF_FILENAME=$sif" >> $GITHUB_ENV
+
+      - name: Set APPTAINER_CMD
+        run: |
+          if [ "${{ matrix.runs-on }}" == "karolina" ]; then
+            apptainer_cmd=apptainer
+          else
+            apptainer_cmd=/opt/apptainer/v1.4.0/apptainer/bin/apptainer
+          fi
+          echo "Using apptainer command: $apptainer_cmd"
+          echo "APPTAINER_CMD=$apptainer_cmd" >> $GITHUB_ENV
+
+      - name: PULL Apptainer SIF
+        run: |
+          # Pull the SIF file from GHCR
+          $APPTAINER_CMD pull -F $SIF_FILENAME oras://${{ inputs.image }}
+          # Inspect the SIF file to verify its contents
+          $APPTAINER_CMD inspect $SIF_FILENAME
+
+      - name: Run Container on self-ubuntu-24.04
+        if: matrix.runs-on == 'self-ubuntu-24.04'
+        run: |
+          # Run the containerized application using mpirun
+          mpirun -np 4 $APPTAINER_CMD run $SIF_FILENAME myapp
+
+      - name: Run Container on Karolina
+        if: matrix.runs-on == 'karolina'
+        run: |
+          # Use a helper script (job_monitor.sh) to submit and monitor the job on Karolina
+          bash job_monitor.sh $SIF_FILENAME

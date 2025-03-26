@@ -1,0 +1,38 @@
+name: DEBUG
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  print:
+    runs-on: self-ubuntu-24.04
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+    steps:
+      - run: echo ${{ github.repository }}
+      - id: string
+        uses: ASzc/change-string-case-action@v6
+        with:
+          string: ${{ github.repository }}
+
+      - run: echo ${{ steps.string.outputs.lowercase }}
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ steps.string.outputs.lowercase }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}        
+  another:
+    needs: print
+    runs-on: self-ubuntu-24.04
+    steps:
+      - run: echo ${{ needs.print.outputs.tags }}
